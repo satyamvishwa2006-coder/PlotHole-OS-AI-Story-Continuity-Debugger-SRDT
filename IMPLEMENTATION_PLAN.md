@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary & Project Status
 
-**PlotHole OS** is an intelligent, script-based screenplay analysis and continuity debugging platform. It ingests narrative text, extracts structural units (scenes, characters, locations, events, timelines, knowledge states, and physical objects), and runs an 8-detector continuity debugging engine combined with Google Gemini contextual reasoning.
+**PlotHole OS** is an intelligent, script-based screenplay analysis and continuity debugging platform. It ingests narrative text, extracts structural units (scenes, characters, locations, events, timelines, knowledge states, and physical objects), and runs an 8-detector continuity debugging engine combined with NVIDIA NIM contextual reasoning.
 
 ### High-Level Status:
 - **Baseline Architecture:** Fully designed, implemented, and verified.
@@ -44,7 +44,7 @@
    - `MissingTransitionDetector`: Jarring scene transitions without narrative bridges.
    - `LogicalContradictionDetector`: Multi-location co-presence and causal paradoxes.
 5. **AI Reasoning & Story Repair (`ai/`)**:
-   - Google Gemini API integration with `gemini-2.5-flash` default model.
+   - NVIDIA NIM API integration with `minimaxai/minimax-m3.1-flash` default model and OpenAI-compatible SDK.
    - Structured JSON prompt engineering.
    - AI Story Repair Assistant with primary recommendations, alternative solutions, and side-by-side narrative diffs (`added`, `deleted`, `equal`).
    - Graceful offline fallback when no API key is configured.
@@ -111,11 +111,11 @@
 - **Dependencies**: Core engines, `utils/helpers.py`.
 - **Key Functions**: `run_all_detectors()`, individual `detect()` methods per class.
 
-### Module 6: Gemini AI Reasoning & Story Repair
-- **Files**: [ai/gemini_service.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/gemini_service.py), [ai/reasoning_engine.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/reasoning_engine.py), [ai/repair_assistant.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/repair_assistant.py), [ai/prompts.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/prompts.py)
+### Module 6: NVIDIA NIM AI Reasoning & Story Repair
+- **Files**: [ai/nvidia_service.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/nvidia_service.py), [ai/gemini_service.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/gemini_service.py), [ai/reasoning_engine.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/reasoning_engine.py), [ai/repair_assistant.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/repair_assistant.py), [ai/prompts.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/prompts.py)
 - **Inputs**: Scene texts, detected issues, screenwriter preferences.
 - **Outputs**: Contextual issue validations, narrative rewrites, impact analysis, and diff blocks.
-- **Dependencies**: `google-genai`, `difflib`.
+- **Dependencies**: `openai`, `difflib`.
 - **Key Functions**: `generate_structured_json()`, `analyze_script_context()`, `generate_repair()`.
 
 ### Module 7: Visualization Engine
@@ -142,8 +142,8 @@ The system enforces strict API key isolation and graceful offline operation:
 flowchart TD
     Start["Application Startup / User Request"] --> CheckKey{"API Key Present in .env or Session?"}
     
-    CheckKey -->|Yes| TestConn["Verify Key via gemini-2.5-flash ping"]
-    TestConn -->|Success| FullAI["Full AI Mode (Rule Detectors + Gemini Deep Audit + AI Repair)"]
+    CheckKey -->|Yes| TestConn["Verify Key via NVIDIA NIM test_connection ping"]
+    TestConn -->|Success| FullAI["Full AI Mode (Rule Detectors + NVIDIA NIM Deep Audit + AI Repair)"]
     TestConn -->|Invalid / Quota| WarnUser["Display Config Warning in UI"] --> RuleOnly["Rule-Based Mode (Deterministic Detectors Active)"]
     
     CheckKey -->|No| RuleOnly
@@ -153,9 +153,9 @@ flowchart TD
 
 ### Key Security & Operational Guarantees:
 1. **Never Hardcoded**: Keys are loaded exclusively via environment variables (`.env`) or entered directly into the session state via the Settings UI.
-2. **Masked UI Display**: The Settings tab displays only masked strings (`AIzaSy...4xQ9`).
+2. **Masked UI Display**: The Settings tab displays only masked strings (`nvapi-4Fg...69K`).
 3. **Zero Crash on Missing Key**: If the key is missing or expired, all 8 rule-based detectors, parsing, timeline, location, knowledge, graph visualizers, PDF generation, and JSON export continue to work with 100% functionality.
-4. **Rate Limit & Retry Handling**: Gemini calls use exponential backoff retry wrappers and token-chunking for feature-length screenplays.
+4. **Rate Limit & Retry Handling**: NVIDIA NIM calls use exponential backoff retry wrappers and token-chunking for feature-length screenplays.
 
 ---
 
@@ -167,7 +167,7 @@ flowchart TD
 | **P1-02: DB Session Fix** | Critical | Low | SQLAlchemy | `expire_on_commit=False` | No `DetachedInstanceError` on lazy access |
 | **P2-01: Heading Merger** | High | Medium | `script_parser.py` | Split slugline collapse logic | Adjacent sluglines merge into a single scene |
 | **P3-01: 8 Continuity Detectors** | Critical | High | Core Engines | 8 Rule-based detectors | Benchmark script detects all 8 planted continuity bugs |
-| **P4-01: Gemini Offline Guard** | High | Medium | `google-genai` | Safe degradation when key is missing | App boots and analyzes scripts without throwing errors |
+| **P4-01: NVIDIA NIM Offline Guard** | High | Medium | `openai` | Safe degradation when key is missing | App boots and analyzes scripts without throwing errors |
 | **P5-01: Complete Visual Suite** | High | Medium | Plotly, NetworkX | 7 interactive charts | All charts render cleanly with empty, dict, or ORM inputs |
 | **P6-01: Report Generation** | Medium | Medium | ReportLab | Executive PDF & JSON exports | Valid downloadable PDF report and clean serialized JSON |
 | **P7-01: Automated Pytest Suite** | Critical | Medium | `pytest` | 16 comprehensive unit tests | All tests pass with 100% exit code 0 in <5 seconds |

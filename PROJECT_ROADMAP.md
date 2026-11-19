@@ -77,13 +77,14 @@ Construct rule-based detectors capable of identifying 8 distinct classes of stor
 
 ---
 
-## Phase 4 – Gemini AI Integration & Contextual Reasoning
+## Phase 4 – NVIDIA NIM AI Integration & Contextual Reasoning
 
 ### Objectives
-Leverage Google Gemini API for deep contextual reasoning, character voice evaluation, and automated narrative repair proposal generation.
+Leverage NVIDIA NIM API (`https://integrate.api.nvidia.com/v1`) via the OpenAI-compatible SDK for deep contextual reasoning, character voice evaluation, and automated narrative repair proposal generation.
 
 ### Work Breakdown & Status
-- [x] **Gemini Service Client (`ai/gemini_service.py`)**: Official `google-genai` SDK wrapper, structured JSON output validation, and temperature tuning. *(Completed)*
+- [x] **NVIDIA NIM Service Client (`ai/nvidia_service.py`)**: OpenAI Python SDK wrapper with models like `minimaxai/minimax-m3.1-flash`, `google/gemma-4-31b-it`, structured JSON output validation, and exponential retry handling. *(Completed)*
+- [x] **Backward-Compatible Alias (`ai/gemini_service.py`)**: Seamless transition redirecting legacy imports to `NvidiaNimService`. *(Completed)*
 - [x] **Secure API Key Handling**: Reads from `.env` or Streamlit session state; never hardcoded; masked in UI. *(Completed)*
 - [x] **Graceful Offline Fallback**: Application remains 100% operational in rule-based mode when no API key is provided. *(Completed)*
 - [x] **Contextual Reasoning Engine (`ai/reasoning_engine.py`)**: Multi-scene context window evaluation for thematic tone and subtle motivation drift. *(Completed)*

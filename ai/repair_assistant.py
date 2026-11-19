@@ -1,13 +1,13 @@
 from typing import Dict, Any, Optional
-from ai.gemini_service import GeminiService
+from ai.nvidia_service import NvidiaNimService
 from ai.prompts import SCENE_REPAIR_PROMPT
 from utils.helpers import generate_text_diff, get_val
 
 class RepairAssistant:
-    """Generates continuity repair suggestions, alternative fixes, and rewritten scenes."""
+    """Generates continuity repair suggestions, alternative fixes, and rewritten scenes using NVIDIA NIM or deterministic fallback."""
 
-    def __init__(self, gemini_service: Optional[GeminiService] = None):
-        self.ai = gemini_service or GeminiService()
+    def __init__(self, nvidia_service: Optional[NvidiaNimService] = None, gemini_service: Optional[Any] = None):
+        self.ai = nvidia_service or gemini_service or NvidiaNimService()
 
     def generate_repair(
         self,
@@ -48,7 +48,7 @@ class RepairAssistant:
                     "revised_scene_text": revised_text,
                     "diff": diff,
                     "target_scene_number": target_scene_number,
-                    "source": "Gemini AI"
+                    "source": "NVIDIA NIM AI"
                 }
 
         # Offline / Rule-based Fallback Repair Generation

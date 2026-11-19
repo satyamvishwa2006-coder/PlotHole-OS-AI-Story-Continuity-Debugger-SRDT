@@ -25,6 +25,7 @@ from core.location_tracker import LocationTracker
 from core.knowledge_tracker import KnowledgeTracker
 from core.object_tracker import ObjectTracker
 from detection.detector_coordinator import DetectorCoordinator
+from ai.nvidia_service import NvidiaNimService
 from ai.gemini_service import GeminiService
 from ai.reasoning_engine import ReasoningEngine
 from ai.repair_assistant import RepairAssistant
@@ -166,8 +167,12 @@ st.markdown("""
 # Session State Initialization
 if "current_project_id" not in st.session_state:
     st.session_state["current_project_id"] = None
+if "nvidia_api_key" not in st.session_state:
+    st.session_state["nvidia_api_key"] = settings.NVIDIA_API_KEY
 if "gemini_api_key" not in st.session_state:
-    st.session_state["gemini_api_key"] = settings.GEMINI_API_KEY
+    st.session_state["gemini_api_key"] = st.session_state.get("nvidia_api_key", settings.NVIDIA_API_KEY)
+if "nvidia_model" not in st.session_state:
+    st.session_state["nvidia_model"] = settings.DEFAULT_NVIDIA_MODEL
 if "active_repair_issue" not in st.session_state:
     st.session_state["active_repair_issue"] = None
 if "jump_to_scene" not in st.session_state:
@@ -319,7 +324,10 @@ elif menu_selection == "2. Upload Script":
             proj_title = st.text_input("Project / Script Title", value="Untitled Screenplay")
             proj_author = st.text_input("Author / Screenwriter", value="Unknown")
             proj_genre = st.selectbox("Genre", ["General", "Action / Thriller", "Sci-Fi / Cyberpunk", "Drama", "Mystery", "Horror", "Comedy"])
-            enable_ai_deep_audit = st.checkbox("Enable Gemini Contextual Reasoning (requires API Key)", value=bool(st.session_state.get("gemini_api_key")))
+            enable_ai_deep_audit = st.checkbox(
+                "Enable NVIDIA NIM Contextual Reasoning (requires API Key)",
+                value=bool(st.session_state.get("nvidia_api_key") or st.session_state.get("gemini_api_key"))
+            )
 
         if uploaded_file is not None:
             file_bytes = uploaded_file.read()
@@ -372,9 +380,10 @@ elif menu_selection == "2. Upload Script":
 
                         # 6. AI Contextual Deep Audit (if requested)
                         ai_issues = []
-                        if enable_ai_deep_audit and st.session_state.get("gemini_api_key"):
-                            st.write("Engaging Gemini AI Contextual Reasoning Engine...")
-                            reasoning_engine = ReasoningEngine(GeminiService(st.session_state.get("gemini_api_key")))
+                        api_key = st.session_state.get("nvidia_api_key") or st.session_state.get("gemini_api_key")
+                        if enable_ai_deep_audit and api_key:
+                            st.write("Engaging NVIDIA NIM AI Contextual Reasoning Engine...")
+                            reasoning_engine = ReasoningEngine(NvidiaNimService(api_key, model=st.session_state.get("nvidia_model")))
                             ai_res = reasoning_engine.analyze_script_context(scenes)
                             if ai_res.get("success"):
                                 ai_issues = ai_res.get("detected_issues", [])
@@ -808,8 +817,9 @@ elif menu_selection == "9. AI Story Repair":
         """, unsafe_allow_html=True)
 
         if st.button("✨ Generate Continuity Repair Proposal", type="primary"):
-            with st.spinner("Generating narrative solutions and diff revision..."):
-                repair_assistant = RepairAssistant(GeminiService(st.session_state.get("gemini_api_key")))
+            with st.spinner("Generating narrative solutions and diff revision with NVIDIA NIM..."):
+                api_key = st.session_state.get("nvidia_api_key") or st.session_state.get("gemini_api_key")
+                repair_assistant = RepairAssistant(NvidiaNimService(api_key, model=st.session_state.get("nvidia_model")))
                 original_text = get_val(target_scene, "raw_content", "") if target_scene else ""
                 repair_res = repair_assistant.generate_repair(target_issue, original_text, target_scene_num)
 
@@ -1000,39 +1010,56 @@ elif menu_selection == "11. Project History":
 elif menu_selection == "12. Settings":
     st.subheader("PlotHole OS Configuration & Environment")
 
-    st.markdown("#### 🤖 Google Gemini AI Configuration")
-    current_key = st.session_state.get("gemini_api_key", "")
-    masked_key = f"{current_key[:6]}...{current_key[-4:]}" if len(current_key) > 10 else ""
+    st.markdown("#### 🤖 NVIDIA NIM AI Configuration")
+    st.caption(f"NVIDIA Endpoint: `{settings.NVIDIA_BASE_URL}`")
+    
+    current_key = st.session_state.get("nvidia_api_key") or st.session_state.get("gemini_api_key", "")
+    masked_key = f"{current_key[:6]}...{current_key[-4:]}" if len(current_key) > 10 else "Not Set"
+    st.text(f"Current Configured Key: {masked_key}")
     
     new_api_key = st.text_input(
-        "Gemini API Key",
+        "NVIDIA API Key",
         value=current_key,
         type="password",
-        help="Enter your Google Gemini API Key to enable deep reasoning, long-script contextual analysis, and scene rewriting."
+        help="Enter your NVIDIA NIM API Key (e.g. nvapi-...) to enable deep contextual reasoning and screenplay repair."
     )
 
     if new_api_key != current_key:
+        st.session_state["nvidia_api_key"] = new_api_key
         st.session_state["gemini_api_key"] = new_api_key
-        st.success("API Key updated in session.")
-
-    c_t1, c_t2 = st.columns(2)
-    with c_t1:
-        if st.button("⚡ Test Gemini API Connection"):
-            service = GeminiService(new_api_key)
-            test_res = service.test_connection()
-            if test_res.get("success"):
-                st.success(f"Connection Successful! Model responded: '{test_res.get('message')}'")
-            else:
-                st.error(test_res.get("error"))
+        settings.NVIDIA_API_KEY = new_api_key
+        st.success("NVIDIA API Key updated in session.")
 
     st.markdown("---")
     st.markdown("#### ⚙️ Analysis & Model Preferences")
+    
+    available_models = [
+        "minimaxai/minimax-m3.1-flash",
+        "google/gemma-4-31b-it",
+        "mistralai/mistral-large-4-1t-a52b"
+    ]
+    current_model = st.session_state.get("nvidia_model", settings.DEFAULT_NVIDIA_MODEL)
+    model_idx = available_models.index(current_model) if current_model in available_models else 0
+
     sel_model = st.selectbox(
-        "Default Gemini Model",
-        ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3-flash-preview", "gemini-3.8-flash"],
-        index=0
+        "NVIDIA NIM Reasoning Model",
+        available_models,
+        index=model_idx,
+        help="Select the active NVIDIA NIM model for contextual screenplay analysis and repair generation."
     )
-    settings.DEFAULT_GEMINI_MODEL = sel_model
+    st.session_state["nvidia_model"] = sel_model
+    settings.DEFAULT_NVIDIA_MODEL = sel_model
+
+    c_t1, c_t2 = st.columns(2)
+    with c_t1:
+        if st.button("⚡ Test NVIDIA NIM API Connection"):
+            with st.spinner("Connecting to NVIDIA NIM..."):
+                service = NvidiaNimService(api_key=new_api_key, model=sel_model)
+                test_res = service.test_connection()
+                if test_res.get("success"):
+                    st.success(f"Connection Successful! Model '{test_res.get('model')}' responded: '{test_res.get('message')}'")
+                else:
+                    st.error(test_res.get("error"))
 
     conf_thresh = st.slider(
         "Minimum Confidence Threshold for Findings",

@@ -5,7 +5,7 @@
 **PlotHole OS** is an AI-powered narrative intelligence platform designed to ingest, parse, model, and debug written screenplays and narrative stories. Its architecture follows a **hybrid multi-tier pipeline**:
 
 1. **Deterministic Rule-Based Detection Layer**: Uses regular expressions, named entity recognition (spaCy), syntactic analysis, and graph theory (NetworkX) to discover hard temporal, spatial, epistemic, and physical contradictions. Operates with 100% functionality offline without any API key.
-2. **Contextual AI Reasoning & Repair Layer**: Uses Google Gemini models (`gemini-2.5-flash`, `gemini-2.5-pro`) to evaluate narrative motivation subtlety, character tone drift, and synthesize scene rewrites with line-by-line diffs.
+2. **Contextual AI Reasoning & Repair Layer**: Uses NVIDIA NIM models (`minimaxai/minimax-m3.1-flash`, `google/gemma-4-31b-it`, `mistralai/mistral-large-4-1t-a52b`) via OpenAI-compatible SDK to evaluate narrative motivation subtlety, character tone drift, and synthesize scene rewrites with line-by-line diffs.
 3. **Reactive Presentation Layer**: Built on Streamlit with custom CSS and Plotly dark-themed interactive visualizations.
 
 ```mermaid
@@ -40,7 +40,7 @@ flowchart TD
     end
 
     subgraph AI["Contextual AI Reasoning & Story Repair Layer"]
-        GeminiSvc["GeminiService (google-genai SDK)"]
+        NvidiaSvc["NvidiaNimService (OpenAI SDK)"]
         Reasoning["ReasoningEngine (Deep Context Audit)"]
         Repair["RepairAssistant (Rewrite & Narrative Diff)"]
     end
@@ -61,7 +61,7 @@ flowchart TD
     Coord --> D1 & D2 & D3 & D4 & D5 & D6 & D7 & D8
     
     Coord -.->|"Optional AI Deep Audit"| Reasoning
-    Reasoning --> GeminiSvc
+    Reasoning --> NvidiaSvc
     
     D1 & D2 & D3 & D4 & D5 & D6 & D7 & D8 --> DB
     DB --> ORM --> Mixin --> UI
@@ -69,7 +69,7 @@ flowchart TD
     UI --> Viz
     UI --> ReportGen
     UI --> Repair
-    Repair --> GeminiSvc
+    Repair --> NvidiaSvc
 ```
 
 ---
@@ -114,13 +114,15 @@ flowchart TD
     6. **Motivation**: Abrupt character betrayals without causal triggers.
     7. **Transition**: Abrupt scene jumps missing narrative continuity cues.
     8. **Logical**: Impossible multi-location co-presence and post-mortem actions.
-  - Merges rule-based detections with optional Gemini contextual inferences, deduplicating findings based on scene overlap and issue type.
+  - Merges rule-based detections with optional NVIDIA NIM contextual inferences, deduplicating findings based on scene overlap and issue type.
 
 ### Tier 5: AI Contextual Reasoning & Repair
-- **`GeminiService` ([ai/gemini_service.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/gemini_service.py))**:
-  - Official `google-genai` SDK wrapper with automatic JSON schema enforcement.
+- **`NvidiaNimService` ([ai/nvidia_service.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/nvidia_service.py))**:
+  - Official OpenAI Python SDK client connected to NVIDIA NIM (`https://integrate.api.nvidia.com/v1`).
+  - Automatic JSON schema enforcement and markdown code fence extraction.
   - API key detection from `.env` or session state; safe offline degradation when missing.
   - Long screenplay chunking with sliding context windows.
+  - Backward-compatible `GeminiService` alias preserved.
 - **`ReasoningEngine` ([ai/reasoning_engine.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/reasoning_engine.py))**:
   - Subtlety auditor analyzing subtext, thematic tone, and emotional trajectories.
 - **`RepairAssistant` ([ai/repair_assistant.py](file:///c:/Users/moolc/OneDrive/Desktop/Generative%20ID/ai/repair_assistant.py))**:
@@ -153,7 +155,7 @@ sequenceDiagram
     participant Parser as ScriptParser
     participant Ext as Extractors & Trackers
     participant Detect as DetectorCoordinator
-    participant AI as GeminiService / Reasoning
+    participant AI as NvidiaNimService / Reasoning
     participant DB as SQLite / Operations
 
     Writer->>UI: Upload Script (PDF / DOCX / TXT)
@@ -169,7 +171,7 @@ sequenceDiagram
     Ext-->>UI: Structured State Data
     UI->>DB: save_characters(), save_events(), save_tracked_objects()
     
-    alt Gemini AI Enabled & Key Present
+    alt NVIDIA NIM AI Enabled & Key Present
         UI->>AI: analyze_script_context(scenes)
         AI-->>UI: Contextual AI Inconsistencies
     else Offline / No Key

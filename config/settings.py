@@ -26,10 +26,24 @@ class Settings(BaseSettings):
     APP_ENV: str = os.getenv("APP_ENV", "development")
     DEBUG: bool = os.getenv("DEBUG", "true").lower() in ("true", "1", "t")
     
-    # Gemini AI
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    DEFAULT_GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
-    FALLBACK_GEMINI_MODEL: str = "gemini-3.5-flash-lite"
+    # AI Provider Configuration (NVIDIA NIM)
+    NVIDIA_API_KEY: str = os.getenv("NVIDIA_API_KEY", os.getenv("GEMINI_API_KEY", ""))
+    NVIDIA_BASE_URL: str = os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1")
+    DEFAULT_NVIDIA_MODEL: str = os.getenv("NVIDIA_MODEL", "minimaxai/minimax-m3.1-flash")
+    FALLBACK_NVIDIA_MODEL: str = "google/gemma-4-31b-it"
+
+    # Backward-compatible aliases
+    @property
+    def GEMINI_API_KEY(self) -> str:
+        return self.NVIDIA_API_KEY
+
+    @property
+    def DEFAULT_GEMINI_MODEL(self) -> str:
+        return self.DEFAULT_NVIDIA_MODEL
+
+    @property
+    def FALLBACK_GEMINI_MODEL(self) -> str:
+        return self.FALLBACK_NVIDIA_MODEL
     
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'plothole.db'}")

@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional
-from ai.gemini_service import GeminiService
+from ai.nvidia_service import NvidiaNimService
 from ai.prompts import (
     CONTINUITY_ANALYSIS_SYSTEM_PROMPT,
     CONTINUITY_AUDIT_PROMPT_TEMPLATE,
@@ -11,15 +11,15 @@ class ReasoningEngine:
     """Orchestrates AI-driven narrative continuity reasoning, long script chunking,
     and cross-scene entity memory."""
 
-    def __init__(self, gemini_service: Optional[GeminiService] = None):
-        self.ai = gemini_service or GeminiService()
+    def __init__(self, nvidia_service: Optional[NvidiaNimService] = None):
+        self.ai = nvidia_service or NvidiaNimService()
 
     def analyze_script_context(self, scenes: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Runs AI-assisted continuity analysis over screenplay scenes."""
         if not self.ai.is_available():
             return {
                 "success": False,
-                "error": "Gemini API key is not configured. Running in Deterministic Rule-Based Mode only.",
+                "error": "NVIDIA API key is not configured. Running in Deterministic Rule-Based Mode only.",
                 "detected_issues": [],
                 "overall_continuity_score": 100
             }

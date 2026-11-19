@@ -8,7 +8,7 @@
 
 **PlotHole OS** is an intelligent, professional-grade screenplay analysis and narrative continuity debugging platform. Designed for screenwriters, script doctors, showrunners, development executives, and story analysts, PlotHole OS ingests written screenplays (PDF, DOCX, TXT), reconstructs their underlying narrative ontology (characters, locations, timelines, knowledge distribution, and physical props), and identifies continuity errors, plot holes, and logical breakdowns.
 
-Unlike generic chatbots or surface-level summarizers, PlotHole OS uses a **hybrid architecture** combining deterministic rule-based verification with Google Gemini AI contextual reasoning. Every identified inconsistency is grounded in verbatim script excerpts, exact scene references, formal causality reasoning, confidence scores, and actionable rewrite recommendations.
+Unlike generic chatbots or surface-level summarizers, PlotHole OS uses a **hybrid architecture** combining deterministic rule-based verification with NVIDIA NIM AI contextual reasoning. Every identified inconsistency is grounded in verbatim script excerpts, exact scene references, formal causality reasoning, confidence scores, and actionable rewrite recommendations.
 
 ---
 
@@ -34,7 +34,7 @@ Screenplays are complex multi-dimensional systems where events unfold non-linear
 ## 3. Technology Stack
 
 - **Application & Dashboard:** Python 3.11+, Streamlit
-- **Generative AI:** Google Gemini API (`google-genai` SDK)
+- **Generative AI:** NVIDIA NIM API (OpenAI-compatible Python SDK via `https://integrate.api.nvidia.com/v1`, models: `minimaxai/minimax-m3.1-flash`, `google/gemma-4-31b-it`, `mistralai/mistral-large-4-1t-a52b`)
 - **Natural Language Processing:** Regular Expressions, spaCy NER tokenization, text normalization
 - **Document Processing:** PyPDF (`pypdf`), python-docx (`docx`), multi-encoding TXT parser
 - **Data & Relational Storage:** SQLite, SQLAlchemy ORM, Pydantic v2
@@ -112,7 +112,8 @@ PlotHole-OS/
 │
 ├── ai/
 │   ├── __init__.py
-│   ├── gemini_service.py       # Google GenAI API client with retries & validation
+│   ├── nvidia_service.py       # NVIDIA NIM API client (OpenAI SDK, retries, JSON validation)
+│   ├── gemini_service.py       # Backward-compatibility alias pointing to NvidiaNimService
 │   ├── prompts.py              # Structured prompts for continuity auditing & repair
 │   ├── reasoning_engine.py     # Multi-chunk script analysis with context memory
 │   └── repair_assistant.py     # Scene rewrite generator & side-by-side diff engine
