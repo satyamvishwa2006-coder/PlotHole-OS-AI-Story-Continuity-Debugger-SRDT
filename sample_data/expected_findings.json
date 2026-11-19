@@ -1,0 +1,54 @@
+{
+  "script_title": "THE CIPHER PROTOCOL",
+  "total_planted_issues": 8,
+  "expected_findings": [
+    {
+      "dimension": "Timeline Contradiction",
+      "scenes": [3, 4],
+      "planted_issue": "Scene 3 is set at 10:00 PM Tuesday, followed immediately by Scene 4 set backwards at 9:00 PM Tuesday without a flashback slugline.",
+      "severity": "High"
+    },
+    {
+      "dimension": "Location Continuity Error",
+      "scenes": [2, 3],
+      "planted_issue": "Marcus is trapped behind sealed blast doors in an underground Berlin bunker in Scene 2, but appears 45 minutes later in a Parisian bistro in Scene 3 with zero transit or escape sequence.",
+      "severity": "High"
+    },
+    {
+      "dimension": "Character Knowledge Inconsistency",
+      "scenes": [1, 2],
+      "planted_issue": "Marcus hid the password 'CHRONOS-9' from Sarah in Scene 1 and claimed the file was blank. In Scene 2, Sarah mysteriously types 'CHRONOS-9' into the bunker terminal without anyone having told her.",
+      "severity": "High"
+    },
+    {
+      "dimension": "Object Continuity Error",
+      "scenes": [3, 5],
+      "planted_issue": "Marcus throws the one-of-a-kind cracked titanium flash drive into an incinerator in Scene 3 where it melts into ash. In Scene 5, Sarah retrieves that exact cracked titanium flash drive intact from her pocket and hands it to Vance.",
+      "severity": "Critical"
+    },
+    {
+      "dimension": "Motivation Contradiction",
+      "scenes": [2, 6],
+      "planted_issue": "Marcus vows in Scene 2 to murder Vance with his bare hands for killing his brother. In Scene 6, Marcus warmly grins and tells Vance 'Anything for you, Director. I'm loyal to the agency and happy to help.' without explanation.",
+      "severity": "High"
+    },
+    {
+      "dimension": "Character Physical Consistency",
+      "scenes": [2, 4],
+      "planted_issue": "Marcus's left shoulder is shattered by a sniper rifle in Scene 2. In Scene 4, he effortlessly hangs from a helicopter skid with his left hand while firing a sniper rifle with his right arm.",
+      "severity": "High"
+    },
+    {
+      "dimension": "Missing Narrative Transition",
+      "scenes": [4, 5],
+      "planted_issue": "Scene 4 ends with Marcus surrounded by 20 armed mercenaries with laser sights on his chest. Scene 5 begins peacefully with Sarah reading in an archive library with no mention of Marcus's fate.",
+      "severity": "Medium"
+    },
+    {
+      "dimension": "Logical Contradiction",
+      "scenes": [4, 6],
+      "planted_issue": "Mercenary leader Korda is shot directly in the heart and his dead body falls off a five-story rooftop in Scene 4. In Scene 6, Korda is standing at attention alive and well beside Vance.",
+      "severity": "Critical"
+    }
+  ]
+}
