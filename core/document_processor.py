@@ -11,8 +11,17 @@ class DocumentProcessor:
     
     @staticmethod
     def extract_text_from_pdf(file_bytes: bytes) -> str:
-        """Extracts text from PDF bytes using pypdf."""
+        """Extracts text from PDF bytes using pypdf with encryption check and page validation."""
         reader = pypdf.PdfReader(io.BytesIO(file_bytes))
+        if reader.is_encrypted:
+            try:
+                reader.decrypt("")
+            except Exception:
+                raise ValueError("Password-protected or encrypted PDF cannot be read without credentials.")
+        
+        if len(reader.pages) == 0:
+            raise ValueError("The uploaded PDF file contains 0 pages.")
+
         pages_text = []
         for page_idx, page in enumerate(reader.pages):
             text = page.extract_text()
@@ -22,9 +31,15 @@ class DocumentProcessor:
 
     @staticmethod
     def extract_text_from_docx(file_bytes: bytes) -> str:
-        """Extracts text from DOCX bytes using python-docx."""
+        """Extracts text from DOCX bytes using python-docx, including paragraphs and tables."""
         doc = docx.Document(io.BytesIO(file_bytes))
         paragraphs_text = [p.text for p in doc.paragraphs if p.text]
+        # Also extract table text (used in dual-column screenplay templates)
+        for table in doc.tables:
+            for row in table.rows:
+                row_cells = [cell.text.strip() for cell in row.cells if cell.text.strip()]
+                if row_cells:
+                    paragraphs_text.append("  ".join(row_cells))
         return "\n\n".join(paragraphs_text)
 
     @staticmethod

@@ -10,7 +10,14 @@ class CharacterExtractor:
     # Stop words that should never be marked as characters
     STOP_CHARACTERS = {
         "FADE", "CUT", "THE", "SCENE", "CONTINUED", "TITLE", "SUPER", "BLACK",
-        "VOICE", "AUDIO", "RADIO", "ANNOUNCER", "MAN", "WOMAN", "PEOPLE", "CROWD"
+        "VOICE", "AUDIO", "RADIO", "ANNOUNCER", "MAN", "WOMAN", "PEOPLE", "CROWD",
+        "DOOR", "ROOM", "WINDOW", "ALARM", "COMPUTER", "PHONE", "CAR", "GUN",
+        "TABLE", "DESK", "LIGHT", "LIGHTS", "WALL", "FLOOR", "CAMERA", "CLOSE",
+        "ANGLE", "POV", "SHOT", "WIDE", "INSERT", "SFX", "VFX", "SOUND",
+        "MORNING", "NIGHT", "DAY", "EVENING", "AFTERNOON", "DUSK", "DAWN", "LATER",
+        "SAME", "TIME", "INT", "EXT", "END", "FLASHBACK", "MONTAGE", "OFFICE",
+        "HALLWAY", "BUILDING", "STREET", "ALLEY", "POLICE", "GUARD", "GUARDS",
+        "BEAT", "PAUSE", "SILENCE", "MOMENTS", "LATER", "HOURS", "MINUTES"
     }
 
     @classmethod

@@ -27,17 +27,23 @@ class ObjectTracker:
             content = get_val(scene, "raw_content", "") or ""
             chars_present = get_val(scene, "characters_present", []) or []
 
-            for kw in cls.OBJECT_KEYWORDS:
+            # Sort keywords by length descending so compound phrases match first
+            sorted_keywords = sorted(cls.OBJECT_KEYWORDS, key=len, reverse=True)
+
+            for kw in sorted_keywords:
                 # Search for specific compound matches like "cracked titanium flash drive" or just "flash drive"
                 matches = re.finditer(r'\b(?:(?:[a-z]+\s+){0,3}' + re.escape(kw) + r')\b', content, re.I)
                 for m in matches:
                     matched_phrase = m.group(0).strip().lower()
+                    # Strip leading articles/pronouns
+                    matched_clean = re.sub(r'^(?:the|a|an|his|her|their|this|that)\s+', '', matched_phrase, flags=re.I).strip().title()
                     # Normalize phrase key to key object term
-                    obj_key = kw.capitalize()
+                    obj_key = kw.title()
+                    obj_name = matched_clean if len(matched_clean) >= len(kw) else obj_key
                     
                     if obj_key not in tracked_objects:
                         tracked_objects[obj_key] = {
-                            "name": matched_phrase.capitalize() if len(matched_phrase) > len(kw) else obj_key,
+                            "name": obj_name,
                             "first_appearance_scene": s_num,
                             "scenes_present": [],
                             "handlers": [],

@@ -49,14 +49,21 @@ class TimelineEngine:
         for idx, s in enumerate(scenes or []):
             time_ref = get_val(s, "time_reference") or get_val(s, "time_of_day", "UNKNOWN")
             minutes = cls.parse_time_minutes(time_ref)
+            raw_content = get_val(s, "raw_content", "") or ""
+            heading = get_val(s, "heading", "") or ""
+            combined_text = f"{heading} {raw_content}"
+            is_flashback = bool(re.search(r'\b(?:FLASHBACK|FLASH-BACK|MEMORY|DREAM SEQUENCE|YEARS EARLIER|MONTHS EARLIER|HOURS EARLIER)\b', combined_text, re.I))
+            is_flashforward = bool(re.search(r'\b(?:FLASHFORWARD|FLASH-FORWARD|YEARS LATER|MONTHS LATER|INTO THE FUTURE)\b', combined_text, re.I))
             scene_timeline.append({
                 "scene_number": get_val(s, "scene_number", idx + 1),
-                "heading": get_val(s, "heading", ""),
+                "heading": heading,
                 "location": get_val(s, "location_name", "UNKNOWN"),
                 "time_reference": time_ref,
                 "parsed_minutes": minutes,
                 "time_of_day": get_val(s, "time_of_day", "DAY"),
-                "characters": get_val(s, "characters_present", []) or []
+                "characters": get_val(s, "characters_present", []) or [],
+                "is_flashback": is_flashback,
+                "is_flashforward": is_flashforward
             })
 
         return {

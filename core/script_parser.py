@@ -26,7 +26,12 @@ class ScriptParser:
         "FADE IN", "FADE OUT", "FADE TO BLACK", "CUT TO", "DISSOLVE TO", "MATCH CUT",
         "BACK TO", "THE END", "CONTINUED", "CONTINUOUS", "TITLE", "SUPER", "BLACK",
         "MOMENTS LATER", "INTERCUT", "SCENE", "ACT", "CHAPTER", "NOTE", "CLOSE ON",
-        "WIDE SHOT", "ANGLE ON", "POV", "FLASHBACK", "END FLASHBACK", "MONTAGE", "VOICE", "AUDIO"
+        "WIDE SHOT", "ANGLE ON", "POV", "FLASHBACK", "END FLASHBACK", "MONTAGE", "VOICE", "AUDIO",
+        "DOOR", "ROOM", "WINDOW", "ALARM", "COMPUTER", "PHONE", "CAR", "GUN",
+        "TABLE", "DESK", "LIGHT", "LIGHTS", "WALL", "FLOOR", "CAMERA", "CLOSE",
+        "ANGLE", "SHOT", "WIDE", "INSERT", "SFX", "VFX", "SOUND", "BEAT", "PAUSE",
+        "MORNING", "NIGHT", "DAY", "EVENING", "AFTERNOON", "DUSK", "DAWN", "LATER",
+        "SAME", "TIME", "INT", "EXT", "END", "OFFICE", "HALLWAY", "BUILDING", "STREET"
     }
 
     @classmethod
